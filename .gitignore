@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# Data (keep structure via .gitkeep, ignore actual data files)
+data/bronze/*
+data/silver/*
+data/gold/*
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
