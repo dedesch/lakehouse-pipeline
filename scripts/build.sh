@@ -26,8 +26,16 @@ python -m src.bronze.ingest_products
 echo "==> Bronze: ingest orders"
 python -m src.bronze.ingest_orders
 
+echo "==> Silver: clean customers"
+python -m src.silver.clean_customers
 
-# then the silver and gold layer scripts.
+echo "==> Silver: clean products"
+python -m src.silver.clean_products
+
+echo "==> Silver: clean orders"
+python -m src.silver.clean_orders
+
+# TODO: add the gold layer scripts here once implemented.
 
 echo "==> Tests"
 set +e
