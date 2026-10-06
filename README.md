@@ -47,13 +47,16 @@ pip install -r requirements.txt
 
 ## How to run
 
-<!-- TODO: document the actual commands once the pipeline is implemented -->
-
 ### Run the full pipeline
 
 ```bash
-# TODO
+./scripts/build.sh
 ```
+
+Runs the currently implemented part of the pipeline (bronze customers
+ingestion) followed by the test suite, and fails loudly on the first error.
+<!-- TODO: extend scripts/build.sh as orders/products ingestion and the
+     silver/gold layers are implemented. -->
 
 ### Run tests
 
