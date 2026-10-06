@@ -142,3 +142,17 @@ root
       investigated.**
 - [ ] **`InvoiceDate` format, timezone, and overall date range**: not yet investigated
       — only a raw sample of the column has been looked at so far.
+
+
+
+### Product price cleansing decision
+
+The product dataset contains multiple records for the same `StockCode`, often with different descriptions and prices. Manual inspection showed that product master data is mixed with operational records such as `check`, `damaged`, `found`, `adjustment`, `amazon`, and `dotcom`, as well as records with missing descriptions.
+
+After removing records with null descriptions and records whose descriptions exactly match identified operational terms, **3,412 out of 3,849 products (88.7%) have a single unambiguous price**, compared with 2,651 out of 3,965 (66.9%) in the raw dataset.
+
+The remaining **437 products (11.3%) still have multiple prices** and cannot be reliably resolved because the source provides no effective date or other attribute indicating which price should be selected. These products affect approximately **16.4% of the order lines**.
+
+The cleansing strategy therefore removes only clearly identifiable operational records and avoids more aggressive heuristics that could incorrectly remove valid products. Products for which the price remains ambiguous are treated as a known data quality issue and are not assigned an arbitrary price. The appropriate business rule should be validated with the relevant business and source-system owners before these records are used for authoritative price or revenue analytics.
+
+**AI usage:** AI assistance was used during this analysis to accelerate exploratory queries and help challenge data-cleansing hypotheses. The resulting assumptions and cleansing decisions were validated against the dataset before being adopted.
