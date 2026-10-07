@@ -19,6 +19,25 @@ def build_dim_product(spark=None):
 
     products = spark.table(SILVER_TABLE)
 
+    # Exclude product snapshots with conflicting states before building SCD2 history.
+    ambiguous_products = (
+        products
+        .groupBy("StockCode", "ingestion_date")
+        .agg(
+            F.countDistinct(
+                F.struct("Description", "UnitPrice")
+            ).alias("state_count")
+        )
+        .filter(F.col("state_count") > 1)
+        .select("StockCode", "ingestion_date")
+    )
+
+    products = products.join(
+        ambiguous_products,
+        ["StockCode", "ingestion_date"],
+        "left_anti",
+    )
+
     product_window = Window.partitionBy("StockCode").orderBy("ingestion_date")
 
     # Detect changes to the tracked product attributes.

@@ -23,6 +23,26 @@ def build_dim_customer(spark=None):
         .filter(F.col("CustomerID").isNotNull())
     )
 
+    # Exclude customer snapshots with conflicting countries before building SCD2 history.
+    customers = (
+        spark.table(SILVER_TABLE)
+        .filter(F.col("CustomerID").isNotNull())
+    )
+
+    ambiguous_customers = (
+        customers
+        .groupBy("CustomerID", "ingestion_date")
+        .agg(F.countDistinct("Country").alias("country_count"))
+        .filter(F.col("country_count") > 1)
+        .select("CustomerID", "ingestion_date")
+    )
+
+    customers = customers.join(
+        ambiguous_customers,
+        ["CustomerID", "ingestion_date"],
+        "left_anti",
+    )
+
     customer_window = Window.partitionBy("CustomerID").orderBy("ingestion_date")
 
     # Detect when a customer's country changes.
