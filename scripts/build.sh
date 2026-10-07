@@ -35,7 +35,17 @@ python -m src.silver.clean_products
 echo "==> Silver: clean orders"
 python -m src.silver.clean_orders
 
-# TODO: add the gold layer scripts here once implemented.
+echo "==> Gold: build dim_customer"
+python -m src.gold.build_dim_customer
+
+echo "==> Gold: build dim_product"
+python -m src.gold.build_dim_product
+
+echo "==> Gold: build dim_date"
+python -m src.gold.build_dim_date
+
+echo "==> Gold: build fact_orders"
+python -m src.gold.build_fact_orders
 
 echo "==> Tests"
 set +e
