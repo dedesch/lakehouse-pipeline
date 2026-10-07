@@ -156,3 +156,16 @@ The remaining **437 products (11.3%) still have multiple prices** and cannot be 
 The cleansing strategy therefore removes only clearly identifiable operational records and avoids more aggressive heuristics that could incorrectly remove valid products. Products for which the price remains ambiguous are treated as a known data quality issue and are not assigned an arbitrary price. The appropriate business rule should be validated with the relevant business and source-system owners before these records are used for authoritative price or revenue analytics.
 
 **AI usage:** AI assistance was used during this analysis to accelerate exploratory queries and help challenge data-cleansing hypotheses. The resulting assumptions and cleansing decisions were validated against the dataset before being adopted.
+
+
+### Gold layer — Implementation decisions
+
+The Gold layer uses a star schema with `fact_orders`, `dim_customer`, `dim_product`, and `dim_date`.
+
+Customer and product dimensions use SCD Type 2 to preserve changes across future daily snapshots. `Country` is tracked for customers, while `Description` and `UnitPrice` are tracked for products. Conflicting values within the same snapshot are considered data quality issues and are expected to be resolved before Gold.
+
+For the provided dataset, `ingestion_date` is a technical processing date and does not match the historical period of `InvoiceDate`. A temporal SCD2 join would therefore be incorrect. `fact_orders` uses the current customer and product versions as reference values. In production, effective-dated source history would be required for accurate historical joins.
+
+The fact grain is one order line after exact duplicate removal. Missing customers are mapped to `Unknown Customer (-1)`. Orders without a reliable product mapping are excluded because their price and revenue cannot be determined.
+
+Revenue is calculated as `quantity * unit_price`. Negative quantities and cancellations are preserved as source business events.
